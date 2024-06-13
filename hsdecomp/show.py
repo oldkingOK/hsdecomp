@@ -1,3 +1,5 @@
+import subprocess
+import os.path as path
 from hsdecomp.types import *
 
 def show_instruction(insn):
@@ -146,19 +148,10 @@ def render_pretty_interpretation(settings, interp, paren_level):
 
     return ret
 
+BIN_PATH = path.dirname(__file__) + "/bin/demangler"
+
 def demangle(ident):
-    table = {'L': '(', 'R': ')', 'M': '[', 'N': ']', 'C': ':', 'Z': 'Z', 'a': '&', 'b': '|', 'c': '^', 'd': '$', 'e': '=', 'g': '>', 'h': '#', 'i': '.', 'l': '<', 'm': '-', 'n': '!', 'p': '+', 'q': '\'', 'r': '\\', 's': '/', 't': '*', 'v': '%', 'z': 'z'}
-    out = ""
-    i = 0
-    while i < len(ident):
-        if ident[i] == 'z' or ident[i] == 'Z':
-            if ident[i+1] in table:
-                out += table[ident[i+1]]
-                i += 2
-                continue
-        out += ident[i]
-        i += 1
-    return out
+    return subprocess.check_output(BIN_PATH, input=ident.encode()).decode().strip()
 
 def name_is_library(name):
     parts = name.split('_')
